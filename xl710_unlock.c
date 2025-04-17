@@ -173,7 +173,7 @@ int main(int argc, char *const *argv) {
         ifr.ifr_data = (void*)eeprom;
         if (ioctl(fd, SIOCETHTOOL, &ifr) == -1) die("write");
       } else {
-        printf("not changing, already unlocked at this misc 0x%04x", *(uint16_t*)(eeprom + 1));
+        printf("not changing, already unlocked in PHY struct %d at offset 0x%04x\n", i, ((phy_offset + ((phy_cap_size + 1) * i))));
       }
       sleep(1);
     }
