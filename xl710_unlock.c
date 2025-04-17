@@ -143,7 +143,7 @@ int main(int argc, char *const *argv) {
     }
   }
 
-  if( change_count > 1 ) die( "Different MISC's values" );
+  if( change_count > 1 ) printf("Warning: different MISC values\n");;
 
   /*
     Patching
@@ -168,10 +168,13 @@ int main(int argc, char *const *argv) {
       eeprom->cmd = ETHTOOL_SEEPROM;
       eeprom->offset = (phy_offset + misc_offset + (phy_cap_size + 1) * i) << 1;
 
-      *(uint16_t*)(eeprom + 1) = misc0 ^ 0x0800;
-      ifr.ifr_data = (void*)eeprom;
-      if (ioctl(fd, SIOCETHTOOL, &ifr) == -1) die("write");
-
+      if(misc0 & 0x0800){ // if locked
+        *(uint16_t*)(eeprom + 1) = misc0 ^ 0x0800;
+        ifr.ifr_data = (void*)eeprom;
+        if (ioctl(fd, SIOCETHTOOL, &ifr) == -1) die("write");
+      } else {
+        printf("not changing, already unlocked at this misc 0x%04x", *(uint16_t*)(eeprom + 1));
+      }
       sleep(1);
     }
 
